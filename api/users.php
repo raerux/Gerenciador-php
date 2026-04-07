@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../config.php';
 
+header('Content-Type: application/json; charset=utf-8');
+
 $method = $_SERVER['REQUEST_METHOD'];
 $action = $_GET['action'] ?? '';
 
@@ -64,5 +66,3 @@ if ($action === 'current' && $method === 'GET') {
 
 http_response_code(400);
 echo json_encode(['success' => false, 'message' => 'Ação inválida']);
-?>
-

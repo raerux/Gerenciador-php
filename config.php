@@ -1,51 +1,25 @@
 <?php
-header('Content-Type: application/json; charset=utf-8');
+// Iniciar sessão primeiro (antes de qualquer output)
+session_start();
 
 // Configuração do banco de dados MySQL
 $host = 'localhost';
-$user = 'root';
-$password = 'password';
+$user = 'israel';
+$password = 'policiacivil';
 $database = 'gerenciador';
 $port = 3306;
 
 try {
-    $db = new PDO("mysql:host=$host;port=$port;charset=utf8mb4", $user, $password);
+    $db = new PDO("mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4", $user, $password);
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Criar banco de dados se não existir
-    $db->exec("CREATE DATABASE IF NOT EXISTS $database");
-
-    // Selecionar banco de dados
-    $db->exec("USE $database");
-
-    // Criar tabelas se não existirem
-    $db->exec("
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            email VARCHAR(255) UNIQUE NOT NULL,
-            password VARCHAR(255) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    ");
-
-    $db->exec("
-        CREATE TABLE IF NOT EXISTS tasks (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT NOT NULL,
-            title VARCHAR(255) NOT NULL,
-            description TEXT,
-            status ENUM('pendente', 'em_andamento', 'concluido') DEFAULT 'pendente',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-    ");
 } catch (PDOException $e) {
-    die('Erro ao conectar ao MySQL: ' . $e->getMessage());
+    header('Content-Type: application/json; charset=utf-8');
+    http_response_code(500);
+    $errorMsg = 'Erro ao conectar ao banco de dados: ' . $e->getMessage();
+    error_log($errorMsg);
+    die(json_encode(['success' => false, 'message' => 'Erro ao conectar ao banco de dados. Verifique a configuração do servidor.']));
 }
-
-// Iniciar sessão
-session_start();
 
 // Função para autenticar usuário
 function authenticate($email, $password) {
@@ -83,5 +57,3 @@ function isAuthenticated() {
 function logout() {
     session_destroy();
 }
-?>
-

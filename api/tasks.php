@@ -1,6 +1,8 @@
 <?php
 require_once __DIR__ . '/../config.php';
 
+header('Content-Type: application/json; charset=utf-8');
+
 if (!isAuthenticated()) {
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Não autenticado']);
@@ -84,5 +86,3 @@ if ($action === 'delete' && $method === 'DELETE') {
 
 http_response_code(400);
 echo json_encode(['success' => false, 'message' => 'Ação inválida']);
-?>
-

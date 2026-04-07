@@ -1,5 +1,4 @@
-// ============ AUTENTICAÇÃO ============
-async function login() {
+    async function login() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
     
@@ -15,14 +14,24 @@ async function login() {
             body: JSON.stringify({ email, password })
         });
         
-        const data = await res.json();
+        const text = await res.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error('Resposta inválida do servidor:', text);
+            alert('Erro: Resposta inválida do servidor');
+            return;
+        }
+        
         if (data.success) {
-            loadDashboard();
+            await loadDashboard();
         } else {
             alert(data.message);
         }
     } catch (error) {
         console.error('Erro:', error);
+        alert('Erro ao fazer login: ' + error.message);
     }
 }
 
@@ -43,16 +52,24 @@ async function register() {
             body: JSON.stringify({ name, email, password })
         });
         
-        const data = await res.json();
+        const text = await res.text();
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (e) {
+            console.error('Resposta inválida do servidor:', text);
+            alert('Erro: Resposta inválida do servidor');
+            return;
+        }
+
         if (data.success) {
             alert('Registrado com sucesso! Faça login');
-            document.getElementById('registerForm').reset();
-            showLoginForm();
         } else {
             alert(data.message);
         }
     } catch (error) {
         console.error('Erro:', error);
+        alert('Erro ao registrar: ' + error.message);
     }
 }
 
@@ -74,7 +91,7 @@ async function loadDashboard() {
         if (data.success) {
             document.getElementById('currentUser').textContent = data.user.name;
             showDashboard();
-            loadTasks();
+            await loadTasks();
         } else {
             showAuthForm();
         }
@@ -168,7 +185,7 @@ async function addTask() {
         if (data.success) {
             document.getElementById('taskTitle').value = '';
             document.getElementById('taskDescription').value = '';
-            loadTasks();
+            await loadTasks();
         } else {
             alert(data.message);
         }
@@ -196,7 +213,7 @@ async function updateTaskStatus(id, status) {
             });
             
             if (updateRes.ok) {
-                loadTasks();
+                await loadTasks();
             }
         }
     } catch (error) {
@@ -216,7 +233,7 @@ async function deleteTask(id) {
         
         const data = await res.json();
         if (data.success) {
-            loadTasks();
+            await loadTasks();
         } else {
             alert(data.message);
         }
@@ -248,4 +265,3 @@ function showRegisterForm() {
 
 // Verificar autenticação ao carregar
 document.addEventListener('DOMContentLoaded', loadDashboard);
-
