@@ -13,7 +13,12 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
-        
+
+        if (!res) {
+            alert('Erro ao fazer login! Status!');
+            return;
+        }
+
         const text = await res.text();
         let data;
         try {
@@ -27,7 +32,7 @@
         if (data.success) {
             await loadDashboard();
         } else {
-            alert(data.message);
+            alert(data.message || 'Erro ao fazer login!');
         }
     } catch (error) {
         console.error('Erro:', error);
@@ -102,12 +107,15 @@ async function loadDashboard() {
 }
 
 // ============ TAREFAS ============
+let currentTasks = [];
+
 async function loadTasks() {
     try {
         const res = await fetch('api/tasks.php?action=list');
         const data = await res.json();
         
         if (data.success) {
+            currentTasks = data.tasks;
             displayTasks(data.tasks);
         } else {
             alert(data.message);
@@ -195,17 +203,18 @@ async function addTask() {
 }
 
 async function updateTaskStatus(id, status) {
+    if (!id || !status) {
+        alert('O status da tarefa não foi informado corretamente.');
+        return false;
+    }
+
+    const task = currentTasks.find(t => t.id === id);
+    if (!task) {
+        alert('Tarefa não encontrada');
+        return false;
+    }
+
     try {
-        const res = await fetch('api/tasks.php?action=list');
-        const data = await res.json();
-        const task = data.tasks.find(t => t.id === id);
-
-        if(!id && !status) {
-            alert('O status da tarefa não foi informado corretamente.');
-            return false;
-        }
-        
-
         const updateRes = await fetch('api/tasks.php?action=update', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -218,7 +227,6 @@ async function updateTaskStatus(id, status) {
         });
 
         if (updateRes.ok) {
-            alert('O status da tarefa foi atualizado com sucesso!');
             await loadTasks();
         }
 

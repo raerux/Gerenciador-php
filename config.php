@@ -4,8 +4,8 @@ session_start();
 
 // Configuração do banco de dados MySQL
 $host = 'localhost';
-$user = 'israel';
-$password = 'policiacivil';
+$user = 'root';
+$password = 'password';
 $database = 'gerenciador';
 $port = 3306;
 $db = null;
