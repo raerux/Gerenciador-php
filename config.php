@@ -8,6 +8,7 @@ $user = 'israel';
 $password = 'policiacivil';
 $database = 'gerenciador';
 $port = 3306;
+$db = null;
 
 try {
     $db = new PDO("mysql:host=$host;port=$port;dbname=$database;charset=utf8mb4", $user, $password);

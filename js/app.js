@@ -87,7 +87,7 @@ async function loadDashboard() {
     try {
         const res = await fetch('api/users.php?action=current');
         const data = await res.json();
-        
+
         if (data.success) {
             document.getElementById('currentUser').textContent = data.user.name;
             showDashboard();
@@ -199,23 +199,29 @@ async function updateTaskStatus(id, status) {
         const res = await fetch('api/tasks.php?action=list');
         const data = await res.json();
         const task = data.tasks.find(t => t.id === id);
-        
-        if (task) {
-            const updateRes = await fetch('api/tasks.php?action=update', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    id,
-                    title: task.title,
-                    description: task.description,
-                    status: status
-                })
-            });
-            
-            if (updateRes.ok) {
-                await loadTasks();
-            }
+
+        if(!id && !status) {
+            alert('O status da tarefa não foi informado corretamente.');
+            return false;
         }
+        
+
+        const updateRes = await fetch('api/tasks.php?action=update', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id,
+                title: task.title,
+                description: task.description,
+                status: status
+            })
+        });
+
+        if (updateRes.ok) {
+            alert('O status da tarefa foi atualizado com sucesso!');
+            await loadTasks();
+        }
+
     } catch (error) {
         console.error('Erro:', error);
     }

@@ -10,11 +10,18 @@ $action = $_GET['action'] ?? '';
 if ($action === 'login' && $method === 'POST') {
     $data = json_decode(file_get_contents('php://input'), true);
 
-    if (authenticate($data['email'] ?? '', $data['password'] ?? '')) {
-        echo json_encode(['success' => true, 'message' => 'Login realizado com sucesso']);
-    } else {
+    if (!isset($data['email']) || !isset($data['password'])) {
         http_response_code(401);
         echo json_encode(['success' => false, 'message' => 'Email ou senha inválidos']);
+        exit;
+    }
+
+    try {
+        authenticate($data['email'], $data['password']);
+        echo json_encode(['success' => true, 'message' => 'Login realizado com sucesso']);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
     }
     exit;
 }
@@ -29,9 +36,11 @@ if ($action === 'register' && $method === 'POST') {
         exit;
     }
 
-    if (register($data['name'], $data['email'], $data['password'])) {
+    try {
+        register($data['name'], $data['email'], $data['password']);
         echo json_encode(['success' => true, 'message' => 'Usuário registrado com sucesso']);
-    } else {
+    }
+    catch (Exception $e) {
         http_response_code(400);
         echo json_encode(['success' => false, 'message' => 'Email já existe']);
     }

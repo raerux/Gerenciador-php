@@ -87,7 +87,7 @@
                         <div class="mb-3">
                             <input type="password" class="form-control" id="registerPassword" placeholder="Senha">
                         </div>
-                        <button class="btn btn-primary w-100 mb-3" onclick="register()">Registrar</button>
+                        <button class="btn btn-primary w-100 mb-3" onclick="register() && showLoginForm()">Registrar</button>
                         <p class="text-center">Já tem conta? <a href="#" onclick="showLoginForm(); return false;">Fazer Login</a></p>
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                         <h6>Adicionar Tarefa</h6>
                         <input type="text" class="form-control mb-2" id="taskTitle" placeholder="Título da tarefa">
                         <textarea class="form-control mb-2" id="taskDescription" placeholder="Descrição (opcional)" rows="2"></textarea>
-                        <button class="btn btn-primary w-100" onclick="addTask()">Adicionar Tarefa</button>
+                        <button class="btn btn-primary w-100" onclick="addTask()" >Adicionar Tarefa</button>
                     </div>
 
                     <hr>
