@@ -14,28 +14,19 @@
             body: JSON.stringify({ email, password })
         });
 
-        if (!res) {
-            alert('Erro ao fazer login! Status!');
-            return;
-        }
-
         const text = await res.text();
         let data;
         try {
             data = JSON.parse(text);
         } catch (e) {
             console.error('Resposta inválida do servidor:', text);
-            alert('Erro: Resposta inválida do servidor');
             return;
         }
         
         if (data.success) {
             await loadDashboard();
-        } else {
-            alert(data.message || 'Erro ao fazer login!');
         }
     } catch (error) {
-        console.error('Erro:', error);
         alert('Erro ao fazer login: ' + error.message);
     }
 }
@@ -98,11 +89,10 @@ async function loadDashboard() {
             showDashboard();
             await loadTasks();
         } else {
-            showAuthForm();
+            alert("Erro ao fazer login!")
         }
     } catch (error) {
-        console.error('Erro:', error);
-        showAuthForm();
+        console.error('Erro:',  error);
     }
 }
 
@@ -203,11 +193,6 @@ async function addTask() {
 }
 
 async function updateTaskStatus(id, status) {
-    if (!id || !status) {
-        alert('O status da tarefa não foi informado corretamente.');
-        return false;
-    }
-
     const task = currentTasks.find(t => t.id === id);
     if (!task) {
         alert('Tarefa não encontrada');
@@ -228,6 +213,7 @@ async function updateTaskStatus(id, status) {
 
         if (updateRes.ok) {
             await loadTasks();
+            alert("O status da tarefa foi alterado!");
         }
 
     } catch (error) {
@@ -276,6 +262,3 @@ function showRegisterForm() {
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('registerForm').style.display = 'block';
 }
-
-// Verificar autenticação ao carregar
-document.addEventListener('DOMContentLoaded', loadDashboard);
