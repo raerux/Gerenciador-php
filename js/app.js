@@ -145,9 +145,14 @@ function displayTasks(tasks) {
                         <h6 class="mb-1">${task.title}</h6>
                         <small class="text-muted">${task.description || 'Sem descrição'}</small>
                     </div>
-                    <button class="btn btn-sm btn-danger" onclick="deleteTask(${task.id})">
-                        Deletar
-                    </button>
+                    <div class="gap-2">
+                        <button class="btn btn-sm btn-primary" onclick="openEditModal(${task.id})">
+                            Editar
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteTask(${task.id})">
+                            Deletar
+                        </button>
+                    </div>
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     <select class="form-select form-select-sm" style="width: auto;" onchange="updateTaskStatus(${task.id}, this.value)">
@@ -216,6 +221,50 @@ async function updateTaskStatus(id, status) {
             alert("O status da tarefa foi alterado!");
         }
 
+    } catch (error) {
+        console.error('Erro:', error);
+    }
+}
+
+function openEditModal(id) {
+    const task = currentTasks.find(t => t.id === id);
+    if (!task) return;
+
+    document.getElementById('editTaskId').value = id;
+    document.getElementById('editTaskTitle').value = task.title;
+    document.getElementById('editTaskDescription').value = task.description || '';
+    document.getElementById('editTaskStatus').value = task.status;
+
+    const modal = new bootstrap.Modal(document.getElementById('editTaskModal'));
+    modal.show();
+}
+
+async function saveEditTask() {
+    const id = parseInt(document.getElementById('editTaskId').value);
+    const title = document.getElementById('editTaskTitle').value;
+    const description = document.getElementById('editTaskDescription').value;
+    const status = document.getElementById('editTaskStatus').value;
+
+    if (!title) {
+        alert('Título é obrigatório');
+        return;
+    }
+
+    try {
+        const res = await fetch('api/tasks.php?action=update', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, title, description, status })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('editTaskModal')).hide();
+            await loadTasks();
+            alert('Tarefa atualizada com sucesso!');
+        } else {
+            alert(data.message);
+        }
     } catch (error) {
         console.error('Erro:', error);
     }
